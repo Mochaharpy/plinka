@@ -22,11 +22,12 @@ app.use(express.static("public"));
 
 app.use("/script", express.static(path.join(import.meta.dirname, "../client")));
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`server running at port: ${port}`)
 })
 
 io.on('connection', (socket) => {
+    console.log('console')
     if (socket.handshake.auth.clientType) {
         const role = socket.handshake.auth.clientType;
 
@@ -47,12 +48,12 @@ io.on('connection', (socket) => {
 
             addPlayer({ playerName: playerName, socketId: socket.id });
 
+            socket.emit('registerSuccess');
             if (!state.hostId) return
             io.to(state.hostId).emit('addPlayer', {
                 socketId: socket.id,
                 playerName: playerName
             })
-            socket.emit('registerSuccess');
         }
     })
 })

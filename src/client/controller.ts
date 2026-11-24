@@ -1,4 +1,3 @@
-import {io, type io as ioClient} from 'socket.io-client';
 
 const socket = io({
     auth: {
@@ -15,3 +14,5 @@ socket.emit('registerPlayer', 'MyName')
 socket.on('registerSuccess', () => {
     console.log('wow')
 })
+
+export {}

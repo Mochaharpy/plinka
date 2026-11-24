@@ -1,8 +1,9 @@
-import express, {type Express, Request, Response} from 'express';
+import express, { type Express, Request, Response } from 'express';
 import http from 'http';
-import {Server} from 'socket.io';
+import { Server } from 'socket.io';
 import path from 'path';
 import fs from 'fs/promises';
+import { hostname } from 'os';
 
 const app: Express = express();
 const server = http.createServer(app);
@@ -19,7 +20,7 @@ const state: ServerState = {
 
 app.use(express.static("public"));
 
-app.use("/script", express.static(path.join(__dirname, "../client")));
+app.use("/script", express.static(path.join(import.meta.dirname, "../client")));
 
 app.listen(port, () => {
     console.log(`server running at port: ${port}`)
@@ -33,6 +34,30 @@ io.on('connection', (socket) => {
             socket.data.role = role;
             state.hostId = socket.id;
             socket.emit('playerList', state.socketIdToPlayerName)
+        } else {
+            socket.emit('redirect', '/controller');
         }
     }
+
+    socket.on('registerPlayer', (playerName: PlayerName) => {
+        if (playerName in state.playerNameToSocketId) {
+            socket.emit('usernameTaken');
+        } else {
+            socket.data.role = 'player';
+
+            addPlayer({ playerName: playerName, socketId: socket.id });
+
+            if (!state.hostId) return
+            io.to(state.hostId).emit('addPlayer', {
+                socketId: socket.id,
+                playerName: playerName
+            })
+            socket.emit('registerSuccess');
+        }
+    })
 })
+
+function addPlayer(player: Player) {
+    state.playerNameToSocketId[player.playerName] = player.socketId;
+    state.socketIdToPlayerName[player.socketId] = player.playerName;
+}

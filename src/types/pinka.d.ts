@@ -6,6 +6,11 @@ declare global {
   type SocketId = string;
   type PlayerName = string;
 
+  interface Player {
+    socketId: SocketId,
+    playerName: PlayerName
+  }
+
   interface Packet<T = any> {
     senderId?: SocketId;
     isGamePacket?: boolean;

@@ -22,3 +22,15 @@ app.use(express.static(path.join(process.cwd(), 'dist', 'public')))
 app.listen(port, () => {
     console.log(`server running at port: ${port}`)
 })
+
+io.on('connection', (socket) => {
+    if (socket.handshake.auth.clientType) {
+        const role = socket.handshake.auth.clientType;
+
+        if (role === 'host' && (!state.hostId || state.hostId == socket.id)) {
+            socket.data.role = role;
+            state.hostId = socket.id;
+            socket.emit('playerList', state.socketIdToPlayerName)
+        }
+    }
+})

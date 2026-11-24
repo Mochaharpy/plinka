@@ -4,9 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "rm -rf dist && tsc && cp -r public dist/public",
-    "start": "node dist/server.js"
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:client": "tsc -p tsconfig.client.json",
+    "build": "pnpm build:server && pnpm build:client",
+    "start": "node dist/server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.6",
+    "socket.io-client": "^4.8.4",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

@@ -17,7 +17,9 @@ const state: ServerState = {
     activeGame: null,
 }
 
-app.use(express.static(path.join(process.cwd(), 'dist', 'public')))
+app.use(express.static("public"));
+
+app.use("/script", express.static(path.join(__dirname, "../client")));
 
 app.listen(port, () => {
     console.log(`server running at port: ${port}`)

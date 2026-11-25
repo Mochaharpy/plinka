@@ -9,7 +9,7 @@ const app: Express = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const port = 8080;
+const port = 80;
 
 const state: ServerState = {
     hostId: null,

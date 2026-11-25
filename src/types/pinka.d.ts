@@ -27,6 +27,11 @@ declare global {
     socketIdToPlayerName: Record<SocketId, PlayerName>;
   }
 
+  interface HostState extends State {
+    playerNameToSocketId: Record<PlayerName, SocketId>;
+    socketIdToPlayer: Record<SocketId, Player>;
+  }
+
   interface ControllerState extends State {}
 
   interface Game {

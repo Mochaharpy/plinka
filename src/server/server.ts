@@ -22,6 +22,7 @@ const state: ServerState = {
 app.use(express.static('public'));
 
 app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
+app.use('/games', express.static(path.join(process.cwd(), 'dist/games')));
 
 server.listen(port, () => {
     const bonjour = new Bonjour();

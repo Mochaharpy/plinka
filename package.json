@@ -1,40 +1,46 @@
 {
-  "name": "plinka",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "build:server": "tsc -p tsconfig.server.json",
-    "build:client": "tsc -p tsconfig.client.json",
-    "build": "pnpm build:server && pnpm build:client",
-    "start": "node dist/server/server.js",
-    "dev:client": "tsc -p tsconfig.client.json --watch",
-    "dev:server": "tsx watch src/server/server.ts",
-    "dev": "concurrently \"pnpm dev:client\" \"pnpm dev:server\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.23.0",
-      "onFail": "download"
+    "name": "plinka",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "build:server": "tsc -p tsconfig.server.json",
+        "build:client": "tsc -p tsconfig.client.json",
+        "build:games:ts": "tsc -p tsconfig.games.json",
+        "build:games:assets": "node copy-games.js",
+        "build:games": "pnpm build:games:ts && pnpm build:games:assets",
+        "build": "pnpm build:server && pnpm build:client && pnpm build:games",
+
+        "dev:server": "tsx watch src/server/server.ts",
+        "dev:client": "tsc -p tsconfig.client.json --watch",
+        "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\"",
+        
+        "dev:games": "concurrently \"node dist/server/server.js\" \"node copy-games.js --watch\" \"tsc -p tsconfig.games.json --watch\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "12.23.0",
+            "onFail": "download"
+        }
+    },
+    "packageManager": "pnpm@12.23.0",
+    "type": "module",
+    "dependencies": {
+        "bonjour-service": "^1.4.4",
+        "express": "^5.3.0",
+        "socket.io": "^4.8.4"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "@types/node": "^26.6.6",
+        "concurrently": "^10.0.7",
+        "copyfiles": "^2.4.1",
+        "socket.io-client": "^4.8.4",
+        "tsx": "^4.23.15",
+        "typescript": "^7.0.2"
     }
-  },
-  "packageManager": "pnpm@12.23.0",
-  "type": "module",
-  "dependencies": {
-    "bonjour-service": "^1.4.4",
-    "express": "^5.3.0",
-    "socket.io": "^4.8.4"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.6.6",
-    "concurrently": "^10.0.7",
-    "socket.io-client": "^4.8.4",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
-  }
 }

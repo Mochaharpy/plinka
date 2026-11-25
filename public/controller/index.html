@@ -6,7 +6,10 @@
     <title>controller</title>
 </head>
 <body>
-    please
+    <form id="name-form">
+        <input name="username" title="Username must be 3 to 16 letters only." type="text" required autocomplete="off">
+        <input type="submit">
+    </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="/script/controller.js"></script>
 </body>

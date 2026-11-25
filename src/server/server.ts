@@ -42,8 +42,15 @@ io.on('connection', (socket) => {
 
     socket.on('registerPlayer', (playerName: PlayerName) => {
         if (playerName in state.playerNameToSocketId) {
-            socket.emit('usernameTaken');
+            socket.emit('invalidUsername', 'Name Taken');
         } else {
+            const playerNameValidity = /(?!)/
+
+            if (!playerNameValidity.test(playerName) || typeof playerName !== 'string') {
+                socket.emit('invalidUsername', 'YOU TRYING TO CHEAT');
+                return;
+            }
+
             socket.data.role = 'player';
 
             addPlayer({ playerName: playerName, socketId: socket.id });

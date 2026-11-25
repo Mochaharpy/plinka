@@ -10,6 +10,8 @@ const state: HostState = {
     activeGame: null,
 };
 
+const playerListElement = document.getElementById('player-list');
+
 socket.on('playerList', (playerList) => {
     
 });
@@ -35,4 +37,8 @@ function removePlayerFromName(playerName: PlayerName) {
     if (!socketId) return;
     delete state.playerNameToSocketId[playerName];
     delete state.socketIdToPlayer[socketId];
+}
+
+function addPlayerCard(player: Player) {
+    playerListElement
 }

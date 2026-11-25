@@ -3,13 +3,14 @@ import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
 import fs from 'fs/promises';
-import { hostname } from 'os';
+import { Bonjour } from 'bonjour-service';
 
 const app: Express = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 const port = 80;
+const hostName = 'game.local'
 
 const state: ServerState = {
     hostId: null,
@@ -20,14 +21,22 @@ const state: ServerState = {
 
 app.use(express.static('public'));
 
-app.use('/script', express.static(path.join(import.meta.dirname, '../client')));
+app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
 
 server.listen(port, () => {
-    console.log(`server running at port: ${port}`);
+    const bonjour = new Bonjour();
+
+    bonjour.publish({
+        name: 'plinka',
+        type: 'http',
+        port: port,
+        host:  hostName,
+    })
+
+    console.log('running at: ', hostName)
 });
 
 io.on('connection', (socket) => {
-    console.log('console');
     if (socket.handshake.auth.clientType) {
         const role = socket.handshake.auth.clientType;
 
@@ -59,6 +68,7 @@ io.on('connection', (socket) => {
             addPlayer({ playerName: playerName, socketId: socket.id });
 
             socket.emit('registerSuccess');
+            console.log('registered: ', playerName)
             if (!state.hostId) return;
             io.to(state.hostId).emit('addPlayer', {
                 socketId: socket.id,
@@ -66,6 +76,17 @@ io.on('connection', (socket) => {
             });
         }
     });
+
+    socket.on('disconnect', () => {
+        if (socket.data.role === 'player') {
+            const playerName = state.socketIdToPlayerName[socket.id];
+            console.log('disconnect player: ', state.socketIdToPlayerName[socket.id])
+            delete state.socketIdToPlayerName[socket.id];
+            delete state.playerNameToSocketId[playerName];
+        } else if (socket.data.role === 'host') {
+            state.hostId = null;
+        }
+    })
 });
 
 function addPlayer(player: Player) {

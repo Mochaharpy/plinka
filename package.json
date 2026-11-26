@@ -32,6 +32,7 @@
     "dependencies": {
         "bonjour-service": "^1.4.4",
         "express": "^5.3.0",
+        "nipplejs": "^1.0.4",
         "socket.io": "^4.8.4"
     },
     "devDependencies": {

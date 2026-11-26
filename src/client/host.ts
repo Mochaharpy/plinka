@@ -12,8 +12,15 @@ const state: HostState = {
 
 const playerListElement = document.getElementById('player-list');
 
-socket.on('playerList', (playerList) => {
-    
+socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
+    for (const socketId in playerList) {
+        if (!Object.hasOwn(playerList, socketId)) continue;
+        
+        const playerName = playerList[socketId];
+        
+        state.playerNameToSocketId[playerName] = socketId;
+        state.socketIdToPlayer[socketId] = {playerName: playerName, socketId: socketId}
+    }
 });
 
 function addPlayer(player: Player) {

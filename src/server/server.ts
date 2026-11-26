@@ -79,7 +79,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendPacket', (packet: Packet) => {
-        
+        if (packet.recipient === 'host' && state.hostId) {
+            io.to(state.hostId).emit("receivePacket", packet);
+        } else if (packet.recipient === 'all' && state.hostId === socket.id) {
+            socket.broadcast.emit('receivePacket', packet);
+        } else {
+            if (packet.recipient in state.socketIdToPlayerName) {
+                io.to(packet.recipient).emit('receivePacket', packet)
+            }
+        }
     })
 
     socket.on('disconnect', () => {

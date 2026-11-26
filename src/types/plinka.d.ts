@@ -3,8 +3,8 @@ import type { io as ioClient } from 'socket.io-client';
 declare global {
     const io: typeof ioClient;
 
-    type SocketId = string;
-    type PlayerName = string;
+    type SocketId = string& { readonly __dummy?: unique symbol };
+    type PlayerName = string& { readonly __dummy?: unique symbol };
 
     interface Player {
         socketId: SocketId;

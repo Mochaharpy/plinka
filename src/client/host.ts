@@ -17,6 +17,9 @@ const playerListElement = document.getElementById(
 const gameListElement = document.getElementById(
     'game-list',
 ) as HTMLUListElement;
+const gameFrameElement = document.getElementById(
+    'game-frame',
+) as HTMLIFrameElement;
 
 socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
     for (const socketId in playerList) {
@@ -34,6 +37,12 @@ socket.on('addPlayer', (player: Player) => {
 
 socket.on('removePlayer', (player: Player) => {
     removePlayer(player);
+});
+
+socket.on('setGame', (gameName: string) => {
+    gameFrameElement.classList.add('active');
+    const entryPoint = state.gameList[gameName].entryPoint.host;
+    gameFrameElement.src = `/games/${gameName}/${entryPoint}`
 });
 
 function addPlayer(player: Player) {
@@ -98,7 +107,7 @@ async function populateGameCards() {
     const gameList = await getGames();
     state.gameList = gameList;
 
-    for (const gameManifest of Object.values(gameList)) {
+    for (const [gameDirectory, gameManifest] of Object.entries(gameList)) {
         const clone = document.importNode(template.content, true);
         const gameCard = clone.querySelector('.game-card') as HTMLLIElement;
         const gameName = gameCard.querySelector(
@@ -118,8 +127,8 @@ async function populateGameCards() {
         gameDescription.textContent = gameManifest.description;
         gameIcon.src = gameManifest.icon ?? '/assets/noimage.svg';
         gamePlayButton.addEventListener('click', () => {
-            setGame(gameManifest.name);
-        })
+            setGame(gameDirectory);
+        });
 
         gameListElement.appendChild(clone);
     }

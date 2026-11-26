@@ -141,6 +141,24 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('setGame', async (gameName) => {
+        try {
+            gameName = path.basename(gameName);
+            const stats = await fs.stat(
+                path.join(process.cwd(), '/dist/games', gameName),
+            );
+            if (stats.isDirectory()) {
+                state.activeGame = gameName;
+                io.emit('setGame', gameName);
+            }
+        } catch (error) {
+            const err = error as NodeJS.ErrnoException
+            if (err.code === 'ENOENT') {
+                console.log('game directory not available')
+            }
+        }
+    });
+
     socket.on('disconnect', () => {
         if (socket.data.role === 'player') {
             const playerName = state.socketIdToPlayerName[socket.id];

@@ -1,10 +1,11 @@
+import {add} from './helper.js'
 let score = 0;
 
 window.addEventListener('message', (event) => {
-    if (event.origin !== window.location.origin) return;
+    console.log(event)
+
     if (event.data.payload === 'button_clicked') {
-        console.log('clicked')
-        score ++;
+        score = add(score, 1);
         document.body.textContent = score.toString();
     }
 })

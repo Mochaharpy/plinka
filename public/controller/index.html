@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>controller</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="waiting-page">
     <form id="name-form">
         <input name="username" title="Username must be 3 to 16 letters only." pattern="[a-zA-Z]{3,16}" type="text" required autocomplete="off">
         <input type="submit">
     </form>
+    </div>
+    <iframe id="game-frame"></iframe>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="/script/controller.js"></script>
 </body>

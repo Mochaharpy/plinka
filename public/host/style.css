@@ -1,0 +1,17 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+    #game-local-qrcode {
+        filter: invert();
+    }
+}
+
+#qrcode {
+    margin-left: 16px;
+    width: fit-content;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}

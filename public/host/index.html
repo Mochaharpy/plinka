@@ -1,21 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Host</title>
-</head>
-<body>
-  <figure>
-    <img src="/assets/gamelocal.svg">
-    <figcaption>http://game.local/controller</figcaption>
-  </figure>
-  <ul id="player-list">
-    <template>
-        
-    </template>
-  </ul>
-  <script src="/socket.io/socket.io.js"></script>
-  <script type="module" src="scripts/host.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Host</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <figure id="qrcode">
+            <img id="game-local-qrcode" src="/assets/gamelocal.svg" />
+            <figcaption>http://game.local/controller</figcaption>
+        </figure>
+        <ul id="player-list">
+            <template id="player-card-template">
+                <li class="player-card"></li>
+            </template>
+        </ul>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="module" src="/script/host.js"></script>
+    </body>
 </html>

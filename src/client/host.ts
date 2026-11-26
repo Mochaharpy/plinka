@@ -15,11 +15,14 @@ const playerListElement = document.getElementById('player-list');
 socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
     for (const socketId in playerList) {
         if (!Object.hasOwn(playerList, socketId)) continue;
-        
+
         const playerName = playerList[socketId];
-        
+
         state.playerNameToSocketId[playerName] = socketId;
-        state.socketIdToPlayer[socketId] = {playerName: playerName, socketId: socketId}
+        state.socketIdToPlayer[socketId] = {
+            playerName: playerName,
+            socketId: socketId,
+        };
     }
 });
 
@@ -47,5 +50,20 @@ function removePlayerFromName(playerName: PlayerName) {
 }
 
 function addPlayerCard(player: Player) {
-    playerListElement
+    const template = document.getElementById(
+        'player-card-template',
+    ) as HTMLTemplateElement;
+
+    const clone = document.importNode(template.content, true);
+
+    const playerCard = clone.querySelector('.player-card') as HTMLLIElement;
+
+    if (playerCard) {
+        playerCard.setAttribute('name', player.playerName);
+        playerCard.setAttribute('socketId', player.socketId);
+
+        playerCard.textContent = player.playerName;
+    }
+
+    playerListElement?.appendChild(clone)
 }

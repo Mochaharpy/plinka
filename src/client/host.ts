@@ -14,7 +14,9 @@ const state: HostState = {
 const playerListElement = document.getElementById(
     'player-list',
 ) as HTMLUListElement;
-const gameListElement = document.getElementById('game-list') as HTMLUListElement;
+const gameListElement = document.getElementById(
+    'game-list',
+) as HTMLUListElement;
 
 socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
     for (const socketId in playerList) {
@@ -80,9 +82,12 @@ function addPlayerCard(player: Player) {
     playerListElement.appendChild(clone);
 }
 
-async function getGames() {
-    const games = await fetch(window.location.origin + '/api/games');
-    state.gameList = await JSON.parse(await games.text());
+async function getGames(): Promise<GameList> {
+    const response = await fetch('/api/games');
+    if (!response.ok) {
+        throw new Error(`couldnt load games, status: ${response.status}`);
+    }
+    return response.json();
 }
 
 async function populateGameCards() {
@@ -90,18 +95,15 @@ async function populateGameCards() {
         'game-card-template',
     ) as HTMLTemplateElement;
 
-    await getGames();
+    const gameList = await getGames();
+    state.gameList = gameList;
 
-    for (const gameDirectoryName in state.gameList) {
-        if (!Object.hasOwn(state.gameList, gameDirectoryName)) continue;
-
-        const gameManifest: GameManifest = state.gameList[gameDirectoryName];
-
+    for (const gameManifest of Object.values(gameList)) {
         const clone = document.importNode(template.content, true);
-
         const gameCard = clone.querySelector('.game-card') as HTMLLIElement;
-
-        const gameName = gameCard.querySelector('.game-name') as HTMLSpanElement;
+        const gameName = gameCard.querySelector(
+            '.game-name',
+        ) as HTMLSpanElement;
         const gameDescription = gameCard.querySelector(
             '.game-description',
         ) as HTMLLIElement;
@@ -111,20 +113,12 @@ async function populateGameCards() {
 
         gameName.textContent = gameManifest.name;
         gameDescription.textContent = gameManifest.description;
-        if (gameManifest.icon) {
-            gameIcon.src = gameManifest.icon;
-        } else {
-            gameIcon.src = '/assets/noimage.svg';
-        }
+        gameIcon.src = gameManifest.icon ?? '/assets/noimage.svg';
 
         gameListElement.appendChild(clone);
-
-        gameCard.addEventListener('click', () => {
-            console.log('hi');
-        });
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  populateGameCards();
+    populateGameCards().catch((error) => console.error(error));
 });

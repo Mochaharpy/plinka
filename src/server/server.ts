@@ -25,7 +25,7 @@ app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
 app.use('/games', express.static(path.join(process.cwd(), 'dist/games')));
 
 app.get('/api/games', async (request, response) => {
-    const gamesDirectoryPath = path.join(process.cwd(), '/src/games/');
+    const gamesDirectoryPath = path.join(process.cwd(), '/dist/games/');
 
     try {
         const gamesDirectory = await fs.readdir(gamesDirectoryPath, {
@@ -79,19 +79,29 @@ server.listen(port, () => {
 
 io.on('connection', (socket) => {
     if (socket.handshake.auth.clientType) {
-        const role = socket.handshake.auth.clientType;
+        const clientType = socket.handshake.auth.clientType;
 
-        if (role === 'host' && (!state.hostId || state.hostId == socket.id)) {
-            socket.data.role = role;
+        if (clientType === 'host') {
+            if (state.hostId && state.hostId !== socket.id) {
+                socket.emit('hostRejected', 'A host is already connected');
+                socket.disconnect();
+                return;
+            }
+            socket.data.role = clientType;
             state.hostId = socket.id;
             socket.emit('playerList', state.socketIdToPlayerName);
-        } else {
-            socket.emit('redirect', '/controller');
+        } else if (clientType !== 'player') {
+            socket.disconnect();
+            return;
         }
     }
 
     socket.on('registerPlayer', (playerName: PlayerName) => {
-        if (playerName in state.playerNameToSocketId) {
+        if (socket.data.role === 'player') {
+            socket.emit('invalidUsername', 'You already joined');
+            return;
+        }
+        if (Object.hasOwn(state.playerNameToSocketId, playerName)) {
             socket.emit('invalidUsername', 'Name Taken');
         } else {
             const playerNameValidity = /^[a-zA-Z]{3,16}$/;
@@ -113,12 +123,13 @@ io.on('connection', (socket) => {
             if (!state.hostId) return;
             io.to(state.hostId).emit('addPlayer', {
                 socketId: socket.id,
-                playerName: playerName,
+                playerName,
             });
         }
     });
 
     socket.on('sendPacket', (packet: Packet) => {
+        packet.senderId = socket.id;
         if (packet.recipient === 'host' && state.hostId) {
             io.to(state.hostId).emit('receivePacket', packet);
         } else if (packet.recipient === 'all' && state.hostId === socket.id) {

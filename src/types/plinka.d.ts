@@ -26,7 +26,6 @@ declare global {
     interface Packet<T = any> {
         recipient: 'host' | 'all' | SocketId;
         senderId?: SocketId;
-        isGamePacket?: boolean;
         payload: T;
     }
 

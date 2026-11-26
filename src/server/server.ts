@@ -25,7 +25,43 @@ app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
 app.use('/games', express.static(path.join(process.cwd(), 'dist/games')));
 
 app.get('/api/games', async (request, response) => {
-    
+    const gamesDirectoryPath = path.join(process.cwd(), '/src/games/');
+
+    try {
+        const gamesDirectory = await fs.readdir(gamesDirectoryPath, {
+            withFileTypes: true,
+        });
+
+        const allGames: GameList = {};
+
+        for (const folderEntry of gamesDirectory) {
+            if (folderEntry.isFile()) {
+                continue;
+            }
+            // we know it is a folder
+            const manifestPath = path.join(
+                folderEntry.parentPath,
+                folderEntry.name,
+                'manifest.json',
+            );
+            try {
+                let manifest = JSON.parse(
+                    await fs.readFile(manifestPath, 'utf-8'),
+                );
+                delete manifest.$schema;
+                allGames[folderEntry.name] = manifest;
+            } catch (error) {
+                console.warn(error);
+            }
+        }
+
+        response.json(allGames);
+    } catch (error) {
+        console.warn(error);
+        response
+            .status(500)
+            .json({ error: 'oopsie, bad thingy in server side' });
+    }
 });
 
 server.listen(port, () => {

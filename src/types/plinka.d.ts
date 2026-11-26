@@ -3,6 +3,18 @@ import type { io as ioClient } from 'socket.io-client';
 declare global {
     const io: typeof ioClient;
 
+    interface GameManifest {
+        name: string,
+        description: string,
+        entryPoint: {
+            controller: string,
+            host: string
+        }
+        icon?: string
+    }
+
+    type GameList = Record<string, GameManifest>
+
     type SocketId = string& { readonly __dummy?: unique symbol };
     type PlayerName = string& { readonly __dummy?: unique symbol };
 

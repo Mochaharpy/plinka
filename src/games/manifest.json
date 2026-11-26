@@ -1,6 +1,5 @@
 {
   "name": "Name of the game",
-  "uuid": "uuid",
   "entryPoint": {
     "controller": "entrypoint for the controller",
     "host": "entrypoint for the host"

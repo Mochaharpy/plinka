@@ -1,0 +1,18 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+}
+
+#game-frame {
+    display: none;
+}
+
+#game-frame.active {
+    display: block;
+}
+
+body:has(#game-frame.active) #waiting-page {
+    display: none;
+}

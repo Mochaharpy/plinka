@@ -144,13 +144,18 @@ io.on('connection', (socket) => {
     socket.on('setGame', async (gameName) => {
         try {
             gameName = path.basename(gameName);
-            const stats = await fs.stat(
-                path.join(process.cwd(), '/dist/games', gameName),
-            );
-            if (stats.isDirectory()) {
-                state.activeGame = gameName;
-                io.emit('setGame', gameName);
-            }
+            const gameDirectoryPath = path.join(process.cwd(), '/dist/games', gameName)
+            
+            const manifestPath = path.join(gameDirectoryPath, 'manifest.json');
+
+            const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
+            const manifest = JSON.parse(manifestRaw);
+
+            state.activeGame = gameName;
+            io.emit('setGame', {
+            gameName: gameName,
+            entryPoint: manifest.entryPoint
+        });
         } catch (error) {
             const err = error as NodeJS.ErrnoException
             if (err.code === 'ENOENT') {

@@ -1,15 +1,19 @@
 const socket = io({
     auth: {
-        clientType: 'player'
-    }
+        clientType: 'player',
+    },
 });
 
 const state: ControllerState = {
     activeGame: null,
-}
+    registered: false,
+};
 
 const nameForm = document.getElementById('name-form') as HTMLFormElement;
-const nameElement = nameForm.querySelector('input[name=username]') as HTMLInputElement;
+const nameElement = nameForm.querySelector(
+    'input[name=username]',
+) as HTMLInputElement;
+const gameFrameElement = document.getElementById('game-frame') as HTMLIFrameElement;
 
 nameElement.addEventListener('input', () => {
     nameElement.setCustomValidity('');
@@ -18,17 +22,17 @@ nameElement.addEventListener('input', () => {
 nameForm.addEventListener('submit', (submitEvent) => {
     submitEvent.preventDefault();
     nameElement.setCustomValidity('');
-    
+
     if (!nameElement.reportValidity()) {
         return;
     }
-    
+
     const nameFormData = new FormData(nameForm);
 
     const name = nameFormData.get('username');
 
     socket.emit('registerPlayer', name);
-})
+});
 
 socket.on('invalidUsername', (reason: string) => {
     nameElement.setCustomValidity(reason || 'Invalid username');
@@ -36,8 +40,16 @@ socket.on('invalidUsername', (reason: string) => {
 });
 
 socket.on('registerSuccess', () => {
-    
+    state.registered = true;
     nameForm.style.display = 'none';
-})
+});
 
-export {}
+socket.on('setGame', (gameData) => {
+    if (!state.registered) return;
+
+    gameFrameElement.classList.add('active');
+
+    gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.controller}`
+});
+
+export {};

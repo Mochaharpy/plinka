@@ -110,10 +110,16 @@ async function populateGameCards() {
         const gameIcon = gameCard.querySelector(
             '.game-icon',
         ) as HTMLImageElement;
+        const gamePlayButton = gameCard.querySelector(
+            '.game-start-button',
+        ) as HTMLButtonElement;
 
         gameName.textContent = gameManifest.name;
         gameDescription.textContent = gameManifest.description;
         gameIcon.src = gameManifest.icon ?? '/assets/noimage.svg';
+        gamePlayButton.addEventListener('click', () => {
+            setGame(gameManifest.name);
+        })
 
         gameListElement.appendChild(clone);
     }
@@ -121,7 +127,7 @@ async function populateGameCards() {
 
 function setGame(gameName: string) {
     if (Object.hasOwn(state.gameList, gameName)) {
-        socket.emit("setGame", gameName);
+        socket.emit('setGame', gameName);
     }
 }
 

@@ -40,12 +40,13 @@ socket.on('removePlayer', (player: Player) => {
 });
 
 socket.on('setGame', (gameData) => {
+    gameListElement.hidePopover();
     gameFrameElement.classList.add('active');
     gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.host}`
 });
 
 socket.on('receivePacket', (packet: Packet) => {
-    gameFrameElement.contentWindow?.postMessage(packet, window.location.origin);
+    gameFrameElement.contentWindow?.postMessage(packet, '*');
 })
 
 function addPlayer(player: Player) {
@@ -147,8 +148,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateGameCards().catch((error) => console.error(error));
 });
 
-window.addEventListener('message', (event) => {
-    if (event.origin !== window.location.origin) return;
+window.addEventListener('message', (messageEvent) => {
+    if (messageEvent.source !== gameFrameElement.contentWindow) return;
 
-    socket.emit('sendPacket', event.data)
-})
+    socket.emit('sendPacket', messageEvent.data);
+});

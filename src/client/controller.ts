@@ -56,10 +56,10 @@ socket.on('receivePacket', (packet: Packet) => {
     gameFrameElement.contentWindow?.postMessage(packet, window.location.origin)
 })
 
-window.addEventListener('message', (event) => {
-    if (event.origin !== window.location.origin) return;
-
-    socket.emit('sendPacket', event.data)
-})
+window.addEventListener('message', (messageEvent) => {
+    if (messageEvent.source !== gameFrameElement.contentWindow) return;
+    
+    socket.emit('sendPacket', messageEvent.data);
+});
 
 export {};

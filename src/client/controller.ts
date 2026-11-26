@@ -52,4 +52,14 @@ socket.on('setGame', (gameData) => {
     gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.controller}`
 });
 
+socket.on('receivePacket', (packet: Packet) => {
+    gameFrameElement.contentWindow?.postMessage(packet, window.location.origin)
+})
+
+window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+
+    socket.emit('sendPacket', event.data)
+})
+
 export {};

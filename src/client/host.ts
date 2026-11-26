@@ -44,6 +44,10 @@ socket.on('setGame', (gameData) => {
     gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.host}`
 });
 
+socket.on('receivePacket', (packet: Packet) => {
+    gameFrameElement.contentWindow?.postMessage(packet, window.location.origin);
+})
+
 function addPlayer(player: Player) {
     state.playerNameToSocketId[player.playerName] = player.socketId;
     state.socketIdToPlayer[player.socketId] = {
@@ -142,3 +146,9 @@ function setGame(gameName: string) {
 document.addEventListener('DOMContentLoaded', async () => {
     populateGameCards().catch((error) => console.error(error));
 });
+
+window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+
+    socket.emit('sendPacket', event.data)
+})

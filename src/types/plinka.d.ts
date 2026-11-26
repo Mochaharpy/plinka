@@ -45,7 +45,9 @@ declare global {
         gameList: GameList
     }
 
-    interface ControllerState extends State {}
+    interface ControllerState extends State {
+        registered: boolean
+    }
 
     interface Game {
         input(): void;

@@ -39,10 +39,9 @@ socket.on('removePlayer', (player: Player) => {
     removePlayer(player);
 });
 
-socket.on('setGame', (gameName: string) => {
+socket.on('setGame', (gameData) => {
     gameFrameElement.classList.add('active');
-    const entryPoint = state.gameList[gameName].entryPoint.host;
-    gameFrameElement.src = `/games/${gameName}/${entryPoint}`
+    gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.host}`
 });
 
 function addPlayer(player: Player) {

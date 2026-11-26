@@ -30,13 +30,17 @@ declare global {
     }
 
     interface State {
-        activeGame: Game | null;
+        activeGame: Game | null | object;
     }
 
     interface ServerState extends State {
         hostId: SocketId | null;
         playerNameToSocketId: Record<PlayerName, SocketId>;
         socketIdToPlayerName: Record<SocketId, PlayerName>;
+        activeGame: {
+            gameName: string,
+            entrypoint: GameManifest['entryPoint']
+        } | null
     }
 
     interface HostState extends State {

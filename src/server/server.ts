@@ -1,4 +1,4 @@
-import express, { type Express, Request, Response } from 'express';
+import express, { type Express } from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
@@ -22,7 +22,14 @@ const state: ServerState = {
 app.use(express.static('public'));
 
 app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
-app.use('/games', express.static(path.join(process.cwd(), 'dist/games')));
+app.use(
+    '/games',
+    (request, response, next) => {
+        response.setHeader('Access-Control-Allow-Origin', '*');
+        next();
+    },
+    express.static(path.join(process.cwd(), 'dist/games')),
+);
 
 app.get('/api/games', async (request, response) => {
     const gamesDirectoryPath = path.join(process.cwd(), '/dist/games/');
@@ -97,7 +104,7 @@ io.on('connection', (socket) => {
     }
 
     socket.on('registerPlayer', (playerName: PlayerName) => {
-        if (socket.data.role === 'player') {
+        if (socket.data.role) {
             socket.emit('invalidUsername', 'You already joined');
             return;
         }
@@ -129,6 +136,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendPacket', (packet: Packet) => {
+        if (typeof packet !== 'object' || packet === null) return;
+console.log(packet)
         packet.senderId = socket.id;
         if (packet.recipient === 'host' && state.hostId) {
             io.to(state.hostId).emit('receivePacket', packet);
@@ -142,24 +151,31 @@ io.on('connection', (socket) => {
     });
 
     socket.on('setGame', async (gameName) => {
+        if (socket.id !== state.hostId) return;
+        if (typeof gameName !== 'string') return;
+
         try {
             gameName = path.basename(gameName);
-            const gameDirectoryPath = path.join(process.cwd(), '/dist/games', gameName)
-            
+            const gameDirectoryPath = path.join(
+                process.cwd(),
+                '/dist/games',
+                gameName,
+            );
+
             const manifestPath = path.join(gameDirectoryPath, 'manifest.json');
 
             const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
             const manifest = JSON.parse(manifestRaw);
 
-            state.activeGame = gameName;
+            state.activeGame = { gameName, entrypoint: manifest.entryPoint };
             io.emit('setGame', {
-            gameName: gameName,
-            entryPoint: manifest.entryPoint
-        });
+                gameName: gameName,
+                entryPoint: manifest.entryPoint,
+            });
         } catch (error) {
-            const err = error as NodeJS.ErrnoException
+            const err = error as NodeJS.ErrnoException;
             if (err.code === 'ENOENT') {
-                console.log('game directory not available')
+                console.log('game directory not available');
             }
         }
     });

@@ -119,6 +119,12 @@ async function populateGameCards() {
     }
 }
 
+function setGame(gameName: string) {
+    if (Object.hasOwn(state.gameList, gameName)) {
+        socket.emit("setGame", gameName);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     populateGameCards().catch((error) => console.error(error));
 });

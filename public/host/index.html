@@ -7,27 +7,30 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <figure id="qrcode">
-            <img id="game-local-qrcode" src="/assets/gamelocal.svg" />
-            <figcaption>http://game.local/controller</figcaption>
-        </figure>
-        <ul id="player-list">
-            <template id="player-card-template">
-                <li class="player-card"></li>
-            </template>
-        </ul>
-        <button popovertarget="game-list">Games</button>
-        <ul id="game-list" popover>
-            <template id="game-card-template">
-                <li class="game-card">
-                    <span class="game-name"></span>
-                    <ul class="game-card-list">
-                        <img class="game-icon" />
-                        <li class="game-description"></li>
-                    </ul>
-                </li>
-            </template>
-        </ul>
+        <div id="lobby">
+            <figure id="qrcode">
+                <img id="game-local-qrcode" src="/assets/gamelocal.svg" />
+                <figcaption>http://game.local/controller</figcaption>
+            </figure>
+            <ul id="player-list">
+                <template id="player-card-template">
+                    <li class="player-card"></li>
+                </template>
+            </ul>
+            <button popovertarget="game-list">Games</button>
+            <ul id="game-list" popover>
+                <template id="game-card-template">
+                    <li class="game-card">
+                        <span class="game-name"></span>
+                        <ul class="game-card-list">
+                            <img class="game-icon" />
+                            <li class="game-description"></li>
+                        </ul>
+                    </li>
+                </template>
+            </ul>
+        </div>
+        <iframe id="game-frame"></iframe>
         <script src="/socket.io/socket.io.js"></script>
         <script type="module" src="/script/host.js"></script>
     </body>

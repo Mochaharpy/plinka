@@ -134,8 +134,7 @@ io.on('connection', (socket) => {
         if (socket.data.role === 'player') {
             const playerName = state.socketIdToPlayerName[socket.id];
 
-            delete state.socketIdToPlayerName[socket.id];
-            delete state.playerNameToSocketId[playerName];
+            removePlayer({ playerName, socketId: socket.id });
 
             if (state.hostId) {
                 io.to(state.hostId).emit('removePlayer', {
@@ -152,4 +151,9 @@ io.on('connection', (socket) => {
 function addPlayer(player: Player) {
     state.playerNameToSocketId[player.playerName] = player.socketId;
     state.socketIdToPlayerName[player.socketId] = player.playerName;
+}
+
+function removePlayer(player: Player) {
+    delete state.socketIdToPlayerName[player.socketId];
+    delete state.playerNameToSocketId[player.playerName];
 }

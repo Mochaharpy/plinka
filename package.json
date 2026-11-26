@@ -2,7 +2,7 @@
     "name": "plinka",
     "version": "1.0.0",
     "description": "",
-    "main": "server.js",
+    "main": "dist/server/server.js",
     "scripts": {
         "build:server": "tsc -p tsconfig.server.json",
         "build:client": "tsc -p tsconfig.client.json",
@@ -14,7 +14,7 @@
         "dev:server": "tsx watch src/server/server.ts",
         "dev:client": "tsc -p tsconfig.client.json --watch",
         "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\"",
-        
+
         "dev:games": "concurrently \"node dist/server/server.js\" \"node copy-games.js --watch\" \"tsc -p tsconfig.games.json --watch\""
     },
     "keywords": [],
@@ -38,7 +38,6 @@
         "@types/express": "^5.0.6",
         "@types/node": "^26.6.6",
         "concurrently": "^10.0.7",
-        "copyfiles": "^2.4.1",
         "socket.io-client": "^4.8.4",
         "tsx": "^4.23.15",
         "typescript": "^7.0.2"

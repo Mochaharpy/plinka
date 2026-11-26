@@ -10,7 +10,7 @@ const state: HostState = {
     activeGame: null,
 };
 
-const playerListElement = document.getElementById('player-list');
+const playerListElement = document.getElementById('player-list') as HTMLUListElement;
 
 socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
     for (const socketId in playerList) {
@@ -18,13 +18,17 @@ socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
 
         const playerName = playerList[socketId];
 
-        state.playerNameToSocketId[playerName] = socketId;
-        state.socketIdToPlayer[socketId] = {
-            playerName: playerName,
-            socketId: socketId,
-        };
+        addPlayer({playerName, socketId})
     }
 });
+
+socket.on('addPlayer', (player: Player) => {
+    addPlayer(player)
+})
+
+socket.on('removePlayer', (player: Player) => {
+    removePlayer(player);
+})
 
 function addPlayer(player: Player) {
     state.playerNameToSocketId[player.playerName] = player.socketId;
@@ -32,21 +36,23 @@ function addPlayer(player: Player) {
         playerName: player.playerName,
         socketId: player.socketId,
     };
+
+    addPlayerCard(player)
 }
 
-function removePlayerFromSocketId(socketId: SocketId) {
-    const player = state.socketIdToPlayer[socketId];
-    if (!player) return;
-    const playerName = player.playerName;
-    delete state.playerNameToSocketId[playerName];
-    delete state.socketIdToPlayer[socketId];
+function removePlayer(player: Player) {
+    delete state.playerNameToSocketId[player.playerName];
+    delete state.socketIdToPlayer[player.socketId];
+
+    removePlayerCard(player);
 }
 
-function removePlayerFromName(playerName: PlayerName) {
-    const socketId = state.playerNameToSocketId[playerName];
-    if (!socketId) return;
-    delete state.playerNameToSocketId[playerName];
-    delete state.socketIdToPlayer[socketId];
+function removePlayerCard(player: Player) {
+    const playerCardElement = playerListElement.querySelector(`[socketId=${player.socketId}]`) as HTMLLIElement;
+
+    if (!playerCardElement) return;
+
+    playerCardElement.remove();
 }
 
 function addPlayerCard(player: Player) {
@@ -65,5 +71,5 @@ function addPlayerCard(player: Player) {
         playerCard.textContent = player.playerName;
     }
 
-    playerListElement?.appendChild(clone)
+    playerListElement.appendChild(clone)
 }

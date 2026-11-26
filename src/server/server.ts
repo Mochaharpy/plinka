@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const port = 80;
-const hostName = 'game.local'
+const hostName = 'game.local';
 
 const state: ServerState = {
     hostId: null,
@@ -31,10 +31,10 @@ server.listen(port, () => {
         name: 'plinka',
         type: 'http',
         port: port,
-        host:  hostName,
-    })
+        host: hostName,
+    });
 
-    console.log('running at: ', hostName)
+    console.log('running at: ', hostName);
 });
 
 io.on('connection', (socket) => {
@@ -63,13 +63,13 @@ io.on('connection', (socket) => {
                 socket.emit('invalidUsername', 'YOU TRYING TO CHEAT');
                 return;
             }
-            
+
             socket.data.role = 'player';
 
             addPlayer({ playerName: playerName, socketId: socket.id });
 
             socket.emit('registerSuccess');
-            console.log('registered: ', playerName)
+            console.log('registered: ', playerName);
             if (!state.hostId) return;
             io.to(state.hostId).emit('addPlayer', {
                 socketId: socket.id,
@@ -80,26 +80,33 @@ io.on('connection', (socket) => {
 
     socket.on('sendPacket', (packet: Packet) => {
         if (packet.recipient === 'host' && state.hostId) {
-            io.to(state.hostId).emit("receivePacket", packet);
+            io.to(state.hostId).emit('receivePacket', packet);
         } else if (packet.recipient === 'all' && state.hostId === socket.id) {
             socket.broadcast.emit('receivePacket', packet);
         } else {
             if (packet.recipient in state.socketIdToPlayerName) {
-                io.to(packet.recipient).emit('receivePacket', packet)
+                io.to(packet.recipient).emit('receivePacket', packet);
             }
         }
-    })
+    });
 
     socket.on('disconnect', () => {
         if (socket.data.role === 'player') {
             const playerName = state.socketIdToPlayerName[socket.id];
-            console.log('disconnect player: ', state.socketIdToPlayerName[socket.id])
+
             delete state.socketIdToPlayerName[socket.id];
             delete state.playerNameToSocketId[playerName];
+
+            if (state.hostId) {
+                io.to(state.hostId).emit('removePlayer', {
+                    socketId: socket.id,
+                    playerName,
+                } as Player);
+            }
         } else if (socket.data.role === 'host') {
             state.hostId = null;
         }
-    })
+    });
 });
 
 function addPlayer(player: Player) {

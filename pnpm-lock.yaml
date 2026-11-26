@@ -207,6 +207,9 @@ importers:
       concurrently:
         specifier: ^10.0.7
         version: 10.0.7
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       socket.io-client:
         specifier: ^4.8.4
         version: 4.8.4(supports-color@10.2.2)

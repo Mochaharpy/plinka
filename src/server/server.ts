@@ -78,6 +78,10 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('sendPacket', (packet: Packet) => {
+        
+    })
+
     socket.on('disconnect', () => {
         if (socket.data.role === 'player') {
             const playerName = state.socketIdToPlayerName[socket.id];

@@ -55,7 +55,7 @@ function removePlayer(player: Player) {
 
 function removePlayerCard(player: Player) {
     const playerCardElement = playerListElement.querySelector(
-        `[socketId=${player.socketId}]`,
+        `[socketId="${player.socketId}"]`,
     ) as HTMLLIElement;
 
     if (!playerCardElement) return;

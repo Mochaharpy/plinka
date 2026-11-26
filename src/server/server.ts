@@ -24,6 +24,10 @@ app.use(express.static('public'));
 app.use('/script', express.static(path.join(process.cwd(), 'dist/client')));
 app.use('/games', express.static(path.join(process.cwd(), 'dist/games')));
 
+app.get('/api/games', async (request, response) => {
+    
+});
+
 server.listen(port, () => {
     const bonjour = new Bonjour();
 

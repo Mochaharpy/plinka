@@ -1,0 +1,9 @@
+{
+    "$schema": "../manifest.json",
+    "description": "A test game",
+    "name": "testgame",
+    "entryPoint": {
+        "controller": "controller.html",
+        "host": "host.html"
+    }
+}

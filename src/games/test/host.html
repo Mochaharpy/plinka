@@ -4,8 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>host!</title>
+    <style>
+        #player-leaderboard {
+            display: flex;
+            flex-direction: column;
+        }
+        .player-card {
+            order: calc(var(--score) * -1);
+        }
+    </style>
 </head>
 <body>
+    <ul id="player-leaderboard">
+        <template id="player-card-template">
+            <li class="player-card">
+                <span class="player-name"></span>: <span class="score">0</span>
+            </li>
+        </template>
+    </ul>
     <script type="module" src="host.js"></script>
 </body>
 </html>

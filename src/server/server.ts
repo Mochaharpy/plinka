@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
                 socket.disconnect();
                 return;
             }
-            socket.data.role = clientType;
+            socket.data.role = 'host';
             state.hostId = socket.id;
             socket.emit('playerList', state.socketIdToPlayerName);
         } else if (clientType !== 'player') {
@@ -118,15 +118,21 @@ io.on('connection', (socket) => {
                 typeof playerName !== 'string'
             ) {
                 socket.emit('invalidUsername', 'YOU TRYING TO CHEAT');
-                return;
+                return; 
             }
 
             socket.data.role = 'player';
 
             addPlayer({ playerName: playerName, socketId: socket.id });
 
-            socket.emit('registerSuccess');
+            socket.emit('registerSuccess', playerName);
             console.log('registered: ', playerName);
+            if (state.activeGame) {
+                socket.emit('setGame', {
+                gameName: state.activeGame.gameName,
+                entryPoint: state.activeGame.entryPoint,
+            })
+            }
             if (!state.hostId) return;
             io.to(state.hostId).emit('addPlayer', {
                 socketId: socket.id,
@@ -137,7 +143,7 @@ io.on('connection', (socket) => {
 
     socket.on('sendPacket', (packet: Packet) => {
         if (typeof packet !== 'object' || packet === null) return;
-console.log(packet)
+
         packet.senderId = socket.id;
         if (packet.recipient === 'host' && state.hostId) {
             io.to(state.hostId).emit('receivePacket', packet);
@@ -150,7 +156,7 @@ console.log(packet)
         }
     });
 
-    socket.on('setGame', async (gameName) => {
+    socket.on('setGame', async (gameName: string) => {
         if (socket.id !== state.hostId) return;
         if (typeof gameName !== 'string') return;
 
@@ -167,7 +173,7 @@ console.log(packet)
             const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
             const manifest = JSON.parse(manifestRaw);
 
-            state.activeGame = { gameName, entrypoint: manifest.entryPoint };
+            state.activeGame = { gameName, entryPoint: manifest.entryPoint };
             io.emit('setGame', {
                 gameName: gameName,
                 entryPoint: manifest.entryPoint,

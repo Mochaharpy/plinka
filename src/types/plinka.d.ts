@@ -27,10 +27,13 @@ declare global {
         recipient: 'host' | 'all' | SocketId;
         senderId?: SocketId;
         payload: T;
+        type?: PacketType
     }
 
+    type PacketType = 'addPlayer' | 'removePlayer' | 'playerList';
+
     interface State {
-        activeGame: Game | null | object;
+        activeGame: boolean | null | object;
     }
 
     interface ServerState extends State {
@@ -39,7 +42,7 @@ declare global {
         socketIdToPlayerName: Record<SocketId, PlayerName>;
         activeGame: {
             gameName: string,
-            entrypoint: GameManifest['entryPoint']
+            entryPoint: GameManifest['entryPoint']
         } | null
     }
 
@@ -56,6 +59,11 @@ declare global {
     interface Game {
         input(): void;
     }
+
+    interface GameState {
+        playerNameToSocketId: Record<PlayerName, SocketId>;
+        socketIdToPlayerName: Record<SocketId, PlayerName>;
+    } 
 }
 
 export {};

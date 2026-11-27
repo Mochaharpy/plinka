@@ -6,8 +6,8 @@
     "scripts": {
         "build:server": "tsc -p tsconfig.server.json",
         "build:client": "tsc -p tsconfig.client.json",
-        "build:games:ts": "tsc -p tsconfig.games.json --noEmit && node build-games.js",
-"dev:games": "concurrently \"node dist/server/server.js\" \"node copy-games.js --watch\" \"node build-games.js --watch\"",
+        "build:games:ts": "tsc -p tsconfig.games.json",
+        "dev:games": "concurrently \"node dist/server/server.js\" \"node copy-games.js --watch\" \"tsc -p tsconfig.games.json --watch\"",
         "build:games:assets": "node copy-games.js",
         "build:games": "pnpm build:games:ts && pnpm build:games:assets",
         "build": "pnpm build:server && pnpm build:client && pnpm build:games",
@@ -15,7 +15,6 @@
         "dev:server": "tsx watch src/server/server.ts",
         "dev:client": "tsc -p tsconfig.client.json --watch",
         "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\""
-
     },
     "keywords": [],
     "author": "",
@@ -39,7 +38,6 @@
         "@types/express": "^5.0.6",
         "@types/node": "^26.6.6",
         "concurrently": "^10.0.7",
-        "esbuild": "^0.28.2",
         "socket.io-client": "^4.8.4",
         "tsx": "^4.23.15",
         "typescript": "^7.0.2"

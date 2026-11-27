@@ -26,7 +26,7 @@ function handleAssetChange(sourcePath) {
         return;
     }
 
-    // The source file or folder is gone, so remove its copy from dist
+    // the source file or folder is gone, so remove its copy from dist
     if (sourcePath.endsWith('.ts')) {
         // tsc compiled this file, so remove its output too
         const compiledPath = distributionPath.replace(/\.ts$/, '.js');

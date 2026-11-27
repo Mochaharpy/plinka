@@ -7,7 +7,7 @@ const socket = io({
 const state: HostState = {
     playerNameToSocketId: {},
     socketIdToPlayer: {},
-    activeGame: null,
+    activeGame: false,
     gameList: {},
 };
 
@@ -29,25 +29,60 @@ socket.on('playerList', (playerList: Record<SocketId, PlayerName>) => {
 
         addPlayer({ playerName, socketId });
     }
+    if (!state.activeGame) return;
+    const packet: Packet = {
+        recipient: 'host',
+        type: 'playerList',
+        payload: {
+            playerList
+        }
+    }
+    sendToGame(packet, 'playerList')
 });
 
 socket.on('addPlayer', (player: Player) => {
     addPlayer(player);
+    if (!state.activeGame) return;
+    const packet: Packet = {
+        recipient: 'host',
+        senderId: player.socketId,
+        payload: {
+            player
+        }
+    }
+    sendToGame(packet, 'addPlayer')
 });
 
 socket.on('removePlayer', (player: Player) => {
     removePlayer(player);
+    if (!state.activeGame) return;
+    const packet: Packet = {
+        recipient: 'host',
+        senderId: player.socketId,
+        payload: {
+            player
+        }
+    }
+    sendToGame(packet, 'removePlayer')
 });
 
 socket.on('setGame', (gameData) => {
     gameListElement.hidePopover();
     gameFrameElement.classList.add('active');
     gameFrameElement.src = `/games/${gameData.gameName}/${gameData.entryPoint.host}`
+    state.activeGame = true;
 });
 
 socket.on('receivePacket', (packet: Packet) => {
-    gameFrameElement.contentWindow?.postMessage(packet, '*');
+    sendToGame(packet);
 })
+
+function sendToGame(packet: Packet, type?: PacketType) {
+    if (state.activeGame) {
+        packet.type = type
+        gameFrameElement.contentWindow?.postMessage(packet, '*')
+    }
+}
 
 function addPlayer(player: Player) {
     state.playerNameToSocketId[player.playerName] = player.socketId;
@@ -150,6 +185,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.addEventListener('message', (messageEvent) => {
     if (messageEvent.source !== gameFrameElement.contentWindow) return;
+    if (messageEvent.data === 'playerList') {
+        const packet: Packet = {
+            recipient: 'host',
+            payload: state.socketIdToPlayer
+        }
+        sendToGame(packet, 'playerList')
+        return
+    }
 
     socket.emit('sendPacket', messageEvent.data);
 });
